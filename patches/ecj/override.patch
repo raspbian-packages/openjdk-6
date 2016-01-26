@@ -1,0 +1,364 @@
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/javax/swing/plaf/synth/SynthComboBoxUI.java openjdk-ecj/jdk/src/share/classes/javax/swing/plaf/synth/SynthComboBoxUI.java
+--- openjdk-ecj.orig/jdk/src/share/classes/javax/swing/plaf/synth/SynthComboBoxUI.java	2011-01-07 21:32:58.000000000 +0000
++++ openjdk-ecj/jdk/src/share/classes/javax/swing/plaf/synth/SynthComboBoxUI.java	2012-06-13 17:39:06.613931192 +0100
+@@ -200,7 +200,6 @@
+         super.uninstallListeners();
+     }
+ 
+-    @Override
+     public SynthContext getContext(JComponent c) {
+         return getContext(c, getComponentState(c));
+     }
+@@ -273,7 +272,6 @@
+     // end UI Initialization
+     //======================
+ 
+-    @Override
+     public void propertyChange(PropertyChangeEvent e) {
+         if (SynthLookAndFeel.shouldUpdateStyle(e)) {
+             updateStyle(comboBox);
+@@ -318,7 +316,6 @@
+         }
+     }
+ 
+-    @Override
+     public void paintBorder(SynthContext context, Graphics g, int x,
+                             int y, int w, int h) {
+         context.getPainter().paintComboBoxBorder(context, g, x, y, w, h);
+@@ -424,7 +421,6 @@
+             setText(" ");
+         }
+ 
+-        @Override
+         public Component getListCellRendererComponent(JList list, Object value,
+                          int index, boolean isSelected, boolean cellHasFocus) {
+             setName("ComboBox.listRenderer");
+@@ -491,7 +487,6 @@
+             editor.setName("ComboBox.textField");
+         }
+ 
+-        @Override
+         public Component getEditorComponent() {
+             return editor;
+         }
+@@ -501,7 +496,6 @@
+          *
+          * @param anObject the displayed value of the editor
+          */
+-        @Override
+         public void setItem(Object anObject) {
+             String text;
+ 
+@@ -517,7 +511,6 @@
+             }
+         }
+ 
+-        @Override
+         public Object getItem() {
+             Object newValue = editor.getText();
+ 
+@@ -540,18 +533,15 @@
+             return newValue;
+         }
+ 
+-        @Override
+         public void selectAll() {
+             editor.selectAll();
+             editor.requestFocus();
+         }
+ 
+-        @Override
+         public void addActionListener(ActionListener l) {
+             editor.addActionListener(l);
+         }
+ 
+-        @Override
+         public void removeActionListener(ActionListener l) {
+             editor.removeActionListener(l);
+         }
+@@ -685,27 +675,22 @@
+         // MouseListener/MouseMotionListener Methods
+         //------------------------------------------------------------------
+ 
+-        @Override
+         public void mouseEntered(MouseEvent mouseEvent) {
+             updateOver(true);
+         }
+ 
+-        @Override
+         public void mouseExited(MouseEvent mouseEvent) {
+             updateOver(false);
+         }
+ 
+-        @Override
+         public void mousePressed(MouseEvent mouseEvent) {
+             updatePressed(true);
+         }
+ 
+-        @Override
+         public void mouseReleased(MouseEvent mouseEvent) {
+             updatePressed(false);
+         }
+ 
+-        @Override
+         public void mouseClicked(MouseEvent e) {}
+ 
+         //------------------------------------------------------------------
+@@ -722,16 +707,13 @@
+          * This bug was only noticed when acting as a button, but may be generally
+          * present. If so, remove the if() block
+          */
+-        @Override
+         public void popupMenuCanceled(PopupMenuEvent e) {
+             if (shouldActLikeButton() || pressedWhenPopupVisible) {
+                 comboBox.repaint();
+             }
+         }
+ 
+-        @Override
+         public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
+-        @Override
+         public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+     }
+ 
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/javax/swing/plaf/synth/SynthLookAndFeel.java openjdk-ecj/jdk/src/share/classes/javax/swing/plaf/synth/SynthLookAndFeel.java
+--- openjdk-ecj.orig/jdk/src/share/classes/javax/swing/plaf/synth/SynthLookAndFeel.java	2012-06-13 17:24:23.771126209 +0100
++++ openjdk-ecj/jdk/src/share/classes/javax/swing/plaf/synth/SynthLookAndFeel.java	2012-06-13 17:39:06.625931390 +0100
+@@ -839,7 +839,6 @@
+             tk.addPropertyChangeListener(key, this);
+         }
+ 
+-        @Override
+         public void propertyChange(PropertyChangeEvent pce) {
+             UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+             if (defaults.getBoolean("Synth.doNotSetTextAA")) {
+@@ -908,7 +907,6 @@
+             if (!isUpdatePending()) {
+                 setUpdatePending(true);
+                 Runnable uiUpdater = new Runnable() {
+-                    @Override
+                     public void run() {
+                         updateAllUIs();
+                         setUpdatePending(false);
+@@ -925,7 +923,6 @@
+     }
+ 
+     private class Handler implements PropertyChangeListener {
+-        @Override
+         public void propertyChange(PropertyChangeEvent evt) {
+             String propertyName = evt.getPropertyName();
+             Object newValue = evt.getNewValue();
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/javax/swing/plaf/synth/SynthTreeUI.java openjdk-ecj/jdk/src/share/classes/javax/swing/plaf/synth/SynthTreeUI.java
+--- openjdk-ecj.orig/jdk/src/share/classes/javax/swing/plaf/synth/SynthTreeUI.java	2011-01-07 21:32:58.000000000 +0000
++++ openjdk-ecj/jdk/src/share/classes/javax/swing/plaf/synth/SynthTreeUI.java	2012-06-13 17:39:06.625931390 +0100
+@@ -154,7 +154,6 @@
+         tree.addPropertyChangeListener(this);
+     }
+ 
+-    @Override
+     public SynthContext getContext(JComponent c) {
+         return getContext(c, getComponentState(c));
+     }
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/sun/net/www/protocol/https/HttpsClient.java openjdk-ecj/jdk/src/share/classes/sun/net/www/protocol/https/HttpsClient.java
+--- openjdk-ecj.orig/jdk/src/share/classes/sun/net/www/protocol/https/HttpsClient.java	2011-01-07 21:33:02.000000000 +0000
++++ openjdk-ecj/jdk/src/share/classes/sun/net/www/protocol/https/HttpsClient.java	2012-06-13 17:39:06.625931390 +0100
+@@ -624,7 +624,6 @@
+      * a given connection may change.  When sessions change, so may
+      * peer identities and cipher suites.
+      */
+-    @Override
+     public void handshakeCompleted(HandshakeCompletedEvent event)
+     {
+         session = event.getSession();
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/sun/security/provider/certpath/OCSPResponse.java openjdk-ecj/jdk/src/share/classes/sun/security/provider/certpath/OCSPResponse.java
+--- openjdk-ecj.orig/jdk/src/share/classes/sun/security/provider/certpath/OCSPResponse.java	2011-01-07 21:33:03.000000000 +0000
++++ openjdk-ecj/jdk/src/share/classes/sun/security/provider/certpath/OCSPResponse.java	2012-06-13 17:39:06.625931390 +0100
+@@ -572,7 +572,7 @@
+         /*
+          * Return the certificate's revocation status code
+          */
+-        @Override public CertStatus getCertStatus() {
++        public CertStatus getCertStatus() {
+             return certStatus;
+         }
+ 
+@@ -580,11 +580,11 @@
+             return certId;
+         }
+ 
+-        @Override public Date getRevocationTime() {
++        public Date getRevocationTime() {
+             return (Date) revocationTime.clone();
+         }
+ 
+-        @Override public Reason getRevocationReason() {
++        public Reason getRevocationReason() {
+             return revocationReason;
+         }
+ 
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/sun/security/x509/X509CRLEntryImpl.java openjdk-ecj/jdk/src/share/classes/sun/security/x509/X509CRLEntryImpl.java
+--- openjdk-ecj.orig/jdk/src/share/classes/sun/security/x509/X509CRLEntryImpl.java	2012-06-13 17:24:23.775126276 +0100
++++ openjdk-ecj/jdk/src/share/classes/sun/security/x509/X509CRLEntryImpl.java	2012-06-13 17:39:26.934270733 +0100
+@@ -463,7 +463,7 @@
+         return (CertificateIssuerExtension)
+             getExtension(PKIXExtensions.CertificateIssuer_Id);
+     }
+-    @Override
++
+     public int compareTo(X509CRLEntryImpl that) {
+         int compSerial = getSerialNumber().compareTo(that.getSerialNumber());
+         if (compSerial != 0) {
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/sun/security/x509/X509CRLImpl.java openjdk-ecj/jdk/src/share/classes/sun/security/x509/X509CRLImpl.java
+--- openjdk-ecj.orig/jdk/src/share/classes/sun/security/x509/X509CRLImpl.java	2012-06-13 17:24:23.779126343 +0100
++++ openjdk-ecj/jdk/src/share/classes/sun/security/x509/X509CRLImpl.java	2012-06-13 17:39:06.625931390 +0100
+@@ -1277,7 +1277,6 @@
+             return hashcode;
+         }
+ 
+-        @Override
+         public int compareTo(X509IssuerSerial another) {
+             int cissuer = issuer.toString()
+                     .compareTo(another.issuer.toString());
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/javax/management/remote/rmi/RMIConnectionImpl.java openjdk-ecj/jdk/src/share/classes/javax/management/remote/rmi/RMIConnectionImpl.java
+--- openjdk-ecj.orig/jdk/src/share/classes/javax/management/remote/rmi/RMIConnectionImpl.java	2012-10-11 19:58:37.130814619 +0100
++++ openjdk-ecj/jdk/src/share/classes/javax/management/remote/rmi/RMIConnectionImpl.java	2012-10-11 19:59:39.699829277 +0100
+@@ -168,7 +168,6 @@
+         this.defaultContextClassLoader =
+             AccessController.doPrivileged(
+                 new PrivilegedAction<ClassLoader>() {
+-                    @Override
+                     public ClassLoader run() {
+                         return new CombinedClassLoader(Thread.currentThread().getContextClassLoader(),
+                                 dcl);
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/sun/security/pkcs11/P11Key.java openjdk-ecj/jdk/src/share/classes/sun/security/pkcs11/P11Key.java
+--- openjdk-ecj.orig/jdk/src/share/classes/sun/security/pkcs11/P11Key.java	2012-10-11 20:18:07.340676704 +0100
++++ openjdk-ecj/jdk/src/share/classes/sun/security/pkcs11/P11Key.java	2012-10-11 20:17:40.092039288 +0100
+@@ -216,7 +216,6 @@
+     /**
+      * Return bit length of the key.
+      */
+-    @Override
+     public int length() { 
+         return keyLength;
+     }
+diff -Nru openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/org/jvnet/mimepull/MemoryData.java openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/org/jvnet/mimepull/MemoryData.java
+--- openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/org/jvnet/mimepull/MemoryData.java	2013-04-16 16:35:02.573376655 +0100
++++ openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/org/jvnet/mimepull/MemoryData.java	2013-04-16 16:37:00.267265360 +0100
+@@ -50,17 +50,14 @@
+     }
+ 
+     // size of the chunk given by the parser
+-    @Override
+     public int size() {
+         return len;
+     }
+ 
+-    @Override
+     public byte[] read() {
+         return data;
+     }
+ 
+-    @Override
+     public long writeTo(DataFile file) {
+         return file.writeTo(data, 0, len);
+     }
+@@ -70,7 +67,6 @@
+      * @param buf
+      * @return
+      */
+-    @Override
+     public Data createNext(DataHead dataHead, ByteBuffer buf) {
+         if (!config.isOnlyMemory() && dataHead.inMemory >= config.memoryThreshold) {
+             try {
+diff -Nru openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/ws/client/WSServiceDelegate.java openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/ws/client/WSServiceDelegate.java
+--- openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/ws/client/WSServiceDelegate.java	2013-04-16 16:35:53.298190677 +0100
++++ openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/ws/client/WSServiceDelegate.java	2013-04-16 16:36:17.818584168 +0100
+@@ -644,7 +644,6 @@
+ 
+         return AccessController.doPrivileged(
+                 new PrivilegedAction<T>() {
+-                    @Override
+                     public T run() {
+                         Object proxy = Proxy.newProxyInstance(portInterface.getClassLoader(),
+                                 new Class[]{portInterface, WSBindingProvider.class, Closeable.class}, pis);
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/com/sun/media/sound/AbstractMidiDevice.java openjdk-ecj/jdk/src/share/classes/com/sun/media/sound/AbstractMidiDevice.java
+--- openjdk-ecj.orig/jdk/src/share/classes/com/sun/media/sound/AbstractMidiDevice.java	2013-04-16 17:23:26.739938611 +0100
++++ openjdk-ecj/jdk/src/share/classes/com/sun/media/sound/AbstractMidiDevice.java	2013-04-16 17:24:03.072520033 +0100
+@@ -483,7 +483,6 @@
+             Receiver. Therefore, subclasses should not override this method.
+             Instead, they should implement implSend().
+         */
+-        @Override
+         public final synchronized void send(final MidiMessage message,
+                                             final long timeStamp) {
+             if (!open) {
+@@ -499,7 +498,6 @@
+          * Therefore, subclasses that override this method must call
+          * 'super.close()'.
+          */
+-        @Override
+         public final void close() {
+             open = false;
+             synchronized (AbstractMidiDevice.this.traRecLock) {
+diff -Nru openjdk-ecj.orig/jdk/src/share/classes/sun/swing/plaf/synth/SynthFileChooserUIImpl.java openjdk-ecj/jdk/src/share/classes/sun/swing/plaf/synth/SynthFileChooserUIImpl.java
+--- openjdk-ecj.orig/jdk/src/share/classes/sun/swing/plaf/synth/SynthFileChooserUIImpl.java	2011-01-07 21:33:03.000000000 +0000
++++ openjdk-ecj/jdk/src/share/classes/sun/swing/plaf/synth/SynthFileChooserUIImpl.java	2012-06-13 17:39:06.625931390 +0100
+@@ -701,7 +701,6 @@
+             this.delegate = delegate;
+         }
+ 
+-        @Override
+         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+             Component c = delegate.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+ 
+diff -Nru openjdk.orig/jdk/src/share/classes/javax/management/modelmbean/RequiredModelMBean.java openjdk/jdk/src/share/classes/javax/management/modelmbean/RequiredModelMBean.java
+--- openjdk-ecj.orig/jdk/src/share/classes/javax/management/modelmbean/RequiredModelMBean.java	2013-03-19 13:40:24.027496931 +0000
++++ openjdk-ecj/jdk/src/share/classes/javax/management/modelmbean/RequiredModelMBean.java	2013-03-19 13:40:56.968026902 +0000
+@@ -1040,7 +1040,6 @@
+                     
+                     targetClass = javaSecurityAccess.doIntersectionPrivilege(new PrivilegedAction<Class<?>>() {
+ 
+-                        @Override
+                         public Class<?> run() {
+                             try {
+                                 ReflectUtil.checkPackageAccess(className);
+@@ -1114,7 +1113,6 @@
+             
+             javaSecurityAccess.doIntersectionPrivilege(new PrivilegedAction<Void>() {
+ 
+-                @Override
+                 public Void run() {
+                     for (int i = 0; i < sig.length; i++) {
+                         if (tracing) {
+@@ -1203,7 +1201,6 @@
+             final String className = opClassName;
+             targetClass = javaSecurityAccess.doIntersectionPrivilege(new PrivilegedAction<Class<?>>() {
+ 
+-                @Override
+                 public Class<?> run() {
+                     try {
+                         ReflectUtil.checkPackageAccess(className);
+@@ -1239,7 +1236,6 @@
+             AccessControlContext stack = AccessController.getContext();
+             Object rslt = javaSecurityAccess.doIntersectionPrivilege(new PrivilegedAction<Object>() {
+ 
+-                @Override
+                 public Object run() {
+                     try {
+                         ReflectUtil.checkPackageAccess(method.getDeclaringClass());
+@@ -1676,7 +1672,6 @@
+                                 
+                                 Class c = javaSecurityAccess.doIntersectionPrivilege(new PrivilegedAction<Class<?>>() {
+ 
+-                                    @Override
+                                     public Class<?> run() {
+                                         try {
+                                             ReflectUtil.checkPackageAccess(respType);
+@@ -2854,7 +2849,6 @@
+ 
+         Class c = javaSecurityAccess.doIntersectionPrivilege(new PrivilegedAction<Class<?>>() {
+ 
+-            @Override
+             public Class<?> run() {
+                 try {
+                     ReflectUtil.checkPackageAccess(className);

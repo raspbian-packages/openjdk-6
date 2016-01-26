@@ -1,0 +1,85 @@
+diff --git a/jdk/src/windows/native/sun/windows/awt_Component.cpp b/jdk/src/windows/native/sun/windows/awt_Component.cpp
+index 7490b4e..660efe7 100644
+--- openjdk.orig/jdk/src/windows/native/sun/windows/awt_Component.cpp
++++ openjdk/jdk/src/windows/native/sun/windows/awt_Component.cpp
+@@ -218,6 +218,10 @@ static UINT lastShiftKeyPressed = 0; // init to safe value
+ // Added by waleed to initialize the RTL Flags
+ BOOL AwtComponent::sm_rtl = PRIMARYLANGID(GetInputLanguage()) == LANG_ARABIC ||
+                             PRIMARYLANGID(GetInputLanguage()) == LANG_HEBREW;
++
++UINT AwtComponent::sm_95WheelMessage = WM_NULL;
++UINT AwtComponent::sm_95WheelSupport = WM_NULL;			    
++
+ BOOL AwtComponent::sm_rtlReadingOrder =
+     PRIMARYLANGID(GetInputLanguage()) == LANG_ARABIC;
+ 
+diff --git a/jdk/src/windows/native/sun/windows/awt_Component.h b/jdk/src/windows/native/sun/windows/awt_Component.h
+index ac60aec..3d02235 100644
+--- openjdk.orig/jdk/src/windows/native/sun/windows/awt_Component.h
++++ openjdk/jdk/src/windows/native/sun/windows/awt_Component.h
+@@ -423,6 +423,10 @@ public:
+     /* Functions for MouseWheel support on Windows95
+      * These should only be called if running on 95
+      */
++    static void Wheel95Init();
++    INLINE static UINT Wheel95GetMsg() {return sm_95WheelMessage;}
++    static UINT Wheel95GetScrLines();
++    
+ 
+     /* Determines whether the component is obscured by another window */
+     // Called on Toolkit thread
+@@ -718,6 +722,10 @@ protected:
+     virtual void SetDragCapture(UINT flags);
+     virtual void ReleaseDragCapture(UINT flags);
+ 
++    // 95 support for mouse wheel
++    static UINT sm_95WheelMessage;
++    static UINT sm_95WheelSupport;    
++
+     //These functions are overridden in AwtWindow to handle non-opaque windows.
+     virtual void FillBackground(HDC hMemoryDC, SIZE &size);
+     virtual void FillAlpha(void *bitmapBits, SIZE &size, BYTE alpha);
+diff --git a/jdk/src/windows/native/sun/windows/awt_MMStub.h b/jdk/src/windows/native/sun/windows/awt_MMStub.h
+index 802899b..18afeeb 100644
+--- openjdk.orig/jdk/src/windows/native/sun/windows/awt_MMStub.h
++++ openjdk/jdk/src/windows/native/sun/windows/awt_MMStub.h
+@@ -74,6 +74,12 @@ extern "C" {
+ #define DEV_STR_LEN                         128
+ 
+ 
++#define ULW_ALPHA                           0x00000002
++#define LWA_ALPHA                           0x00000002
++#define WS_EX_LAYERED                       0x00080000
++#define WS_EX_NOACTIVATE                    0x08000000L
++
++
+ //  Datatypes
+ typedef HANDLE                              MHND;
+ typedef BOOL (CALLBACK* MON_ENUM_CALLBACK_PROC)(MHND,HDC,LPRECT,LPARAM);
+@@ -105,6 +111,15 @@ typedef struct tagDISPLAY_DEVICE
+     WCHAR       deviceKey[128];
+ } _DISPLAY_DEVICE, *P_DISPLAY_DEVICE;
+ 
++typedef struct tagMSLLHOOKSTRUCT 
++{
++    POINT       pt;
++    DWORD       mouseData;
++    DWORD       flags;
++    DWORD       time;
++    ULONG_PTR   dwExtraInfo;
++} MSLLHOOKSTRUCT, *PMSLLHOOKSTRUCT, *LPMSLLHOOKSTRUCT;
++
+ /*  Basic API's  */
+ BOOL WINAPI                     _enumDisplayMonitors(HDC,LPCRECT,MON_ENUM_CALLBACK_PROC,LPARAM);
+ BOOL WINAPI                     _enumDisplayDevices (LPVOID,int,P_DISPLAY_DEVICE,DWORD);
+@@ -122,6 +137,10 @@ HDC WINAPI                      _makeDCFromMonitor  (MHND);
+ HWND WINAPI                     _createWindowOM     (MHND,LPCTSTR,LPCTSTR,DWORD,int,int,int,
+                                                      int,HWND,HMENU,HANDLE,LPVOID);
+ 
++WINUSERAPI BOOL WINAPI          SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
++WINUSERAPI BOOL WINAPI          UpdateLayeredWindow(HWND,HDC,POINT*,SIZE*,HDC,POINT*,COLORREF,BLENDFUNCTION*,DWORD);
++
++
+ #ifdef __cplusplus
+ }
+ #endif  /* __cplusplus */

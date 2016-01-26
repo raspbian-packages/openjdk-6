@@ -1,0 +1,29 @@
+# Exclude list for jdk tests. These tests require binary plugs to pass, or are
+# incorrect/obsolete, or require special setup.
+
+#
+# Binary plugs
+#
+
+# snmp is not available in openjdk6
+com/sun/jmx/snmp/SnmpOidHashCode.java
+com/sun/jmx/snmp/TimeTicksWrapping.java
+# requires missing input files nfscsi.spp, nfscss.spp, nfscis.spp, nfsmxp.spp, 
+# and nfsmxs.spp
+sun/net/idn/TestStringPrep.java
+
+#
+# Special setup required
+#
+
+# this test sends udp packets and requires the name of a remote host with a 
+# tcp (not icmp) echo server running
+java/nio/channels/DatagramChannel/AdaptDatagramSocket.java
+
+#
+# Obsolete
+#
+
+# test checks a bug in CUPS/PostScript that has been fixed
+# see https://bugs.openjdk.java.net/show_bug.cgi?id=100022
+javax/print/attribute/PSCopiesFlavorTest.java

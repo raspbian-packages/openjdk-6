@@ -1,0 +1,30 @@
+# HG changeset patch
+# User andrew
+# Date 1374490968 -3600
+# Node ID 12877b5c159d4b44954163cc4cc91661969f6b84
+# Parent  7aeb2bc6bc331d96af4b4db95f24654424275290
+7053526: Upgrade JDK 8 to use Little CMS 2.4
+Reviewed-by: prr, jgodinez
+
+diff --git a/make/sun/cmm/lcms/FILES_c_unix.gmk b/make/sun/cmm/lcms/FILES_c_unix.gmk
+--- openjdk/jdk/make/sun/cmm/lcms/FILES_c_unix.gmk
++++ openjdk/jdk/make/sun/cmm/lcms/FILES_c_unix.gmk
+@@ -32,6 +32,7 @@
+     cmserr.c \
+     cmsgamma.c \
+     cmsgmt.c \
++    cmshalf.c \
+     cmsintrp.c \
+     cmsio0.c \
+     cmsio1.c \
+diff --git a/make/sun/cmm/lcms/FILES_c_windows.gmk b/make/sun/cmm/lcms/FILES_c_windows.gmk
+--- openjdk/jdk/make/sun/cmm/lcms/FILES_c_windows.gmk
++++ openjdk/jdk/make/sun/cmm/lcms/FILES_c_windows.gmk
+@@ -30,6 +30,7 @@
+     cmserr.c \
+     cmsgamma.c \
+     cmsgmt.c \
++    cmshalf.c \
+     cmsintrp.c \
+     cmsio0.c \
+     cmsio1.c \

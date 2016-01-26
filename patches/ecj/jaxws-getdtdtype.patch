@@ -1,0 +1,29 @@
+diff -Nru openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/bind/v2/runtime/unmarshaller/StAXEventConnector.java openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/bind/v2/runtime/unmarshaller/StAXEventConnector.java
+--- openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/bind/v2/runtime/unmarshaller/StAXEventConnector.java	2014-10-15 22:55:39.955155652 +0100
++++ openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/bind/v2/runtime/unmarshaller/StAXEventConnector.java	2014-10-15 22:56:29.899840571 +0100
+@@ -276,7 +276,7 @@
+                 qName = localName;
+             else
+                 qName = prefix + ':' + localName;
+-            String type = staxAttr.getDTDType();
++            String type = staxAttr.getDTDType().toString();
+             String value = staxAttr.getValue();
+ 
+             attrs.addAttribute(uri, localName, qName, type, value);
+diff -Nru openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/fastinfoset/stax/events/AttributeBase.java openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/fastinfoset/stax/events/AttributeBase.java
+--- openjdk-ecj.orig/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/fastinfoset/stax/events/AttributeBase.java	2014-10-15 22:55:18.002854659 +0100
++++ openjdk-ecj/jaxws/drop_included/jaxws_src/src/com/sun/xml/internal/fastinfoset/stax/events/AttributeBase.java	2014-10-15 22:56:29.899840571 +0100
+@@ -108,11 +108,10 @@
+    * the String "CDATA"
+    * @return the type as a String, default is "CDATA"
+    */
+-    public String getDTDType() {
+-        return _attributeType;
++    public QName getDTDType() {
++        return new QName(_attributeType);
+     }
+ 
+-
+   /**
+    * A flag indicating whether this attribute was actually
+    * specified in the start-tag of its element, or was defaulted from the schema.

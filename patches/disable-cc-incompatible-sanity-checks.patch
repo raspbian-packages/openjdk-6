@@ -1,0 +1,77 @@
+diff -Nru openjdk.orig/jdk/make/common/Sanity.gmk openjdk/jdk/make/common/Sanity.gmk
+--- openjdk.orig/jdk/make/common/Sanity.gmk	2012-10-26 19:25:40.000000000 +0100
++++ openjdk/jdk/make/common/Sanity.gmk	2013-09-02 17:26:52.257169562 +0100
+@@ -91,8 +91,11 @@
+     sane-ld_options \
+     sane-ld_run_path \
+     sane-alt_bootdir \
+-    sane-bootdir \
+-    sane-alsa-headers
++    sane-bootdir
++
++ifndef CROSS_COMPILATION
++sanity-all:: sane-alsa-headers
++endif
+ 
+ ifdef OPENJDK
+ sanity-all:: sane-freetype 
+@@ -108,17 +111,21 @@
+ #   (Which only happens with a full control build. The control makefiles are
+ #    the files that set BUILD_MOTIF).
+ #   We cannot sanity check something that has not been built yet. 
+-ifeq ($(PLATFORM), linux)
+-  ifneq ($(BUILD_MOTIF), true)
++ifndef CROSS_COMPILATION
++  ifeq ($(PLATFORM), linux)
++    ifneq ($(BUILD_MOTIF), true)
+ sanity-all:: \
+-    sane-motif
++  sane-motif
++    endif
+   endif
+ endif
+ 
+ # Always check cups header paths on solaris & linux
+-ifneq ($(PLATFORM), windows)
++ifndef CROSS_COMPILATION
++  ifneq ($(PLATFORM), windows)
+ sanity-all:: \
+     sane-cups
++  endif
+ endif
+ 
+ # Always check hotspot binary paths even if we are building them from scratch
+diff -Nru openjdk.orig/jdk/make/common/shared/Sanity.gmk openjdk/jdk/make/common/shared/Sanity.gmk
+--- openjdk.orig/jdk/make/common/shared/Sanity.gmk	2013-09-02 17:03:28.039330395 +0100
++++ openjdk/jdk/make/common/shared/Sanity.gmk	2013-09-02 17:32:35.854512833 +0100
+@@ -159,6 +159,11 @@
+ # Get ALL_SETTINGS defined
+ include $(JDK_MAKE_SHARED_DIR)/Sanity-Settings.gmk
+ 
++ifndef CROSS_COMPILATION
++MORE_PHONY_RULES = \
++  sane-freetype
++endif
++
+ .PHONY: \
+ 	sane-copyrightyear\
+ 	sane-settings \
+@@ -187,8 +192,7 @@
+ 	sane-outputdir \
+ 	sane-alt_bootdir \
+ 	sane-bootdir \
+-	sane-motif \
+-        sane-cups \
++	sane-cups \
+ 	sane-devtools_path \
+ 	sane-compiler_path \
+ 	sane-unixcommand_path \
+@@ -211,7 +215,7 @@
+ 	sane-zip_version \
+ 	sane-unzip_version \
+  	sane-msvcrt_path \
+-        sane-freetype
++        $(MORE_PHONY_RULES)
+ 
+ ######################################################
+ # check for COPYRIGHT_YEAR variable

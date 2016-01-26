@@ -1,0 +1,26 @@
+diff -Nru openjdk.orig/jdk/make/sun/awt/Makefile openjdk/jdk/make/sun/awt/Makefile
+--- openjdk.orig/jdk/make/sun/awt/Makefile	2010-08-02 20:41:47.000000000 +0100
++++ openjdk/jdk/make/sun/awt/Makefile	2010-08-02 20:47:24.593166977 +0100
+@@ -388,7 +388,8 @@
+ 	fontconfig.SuSE.properties                      \
+ 	fontconfig.Ubuntu.properties                    \
+ 	fontconfig.Fedora.properties			\
+-	fontconfig.RedHat.6.properties
++	fontconfig.RedHat.6.properties		\
++	fontconfig.Gentoo.properties
+ else
+ 
+ FONTCONFIGS_SRC	= $(CLOSED_SRC)/solaris/classes/sun/awt/fontconfigs
+diff -Nru openjdk.orig/jdk/src/solaris/classes/sun/awt/motif/MFontConfiguration.java openjdk/jdk/src/solaris/classes/sun/awt/motif/MFontConfiguration.java
+--- openjdk.orig/jdk/src/solaris/classes/sun/awt/motif/MFontConfiguration.java	2010-06-21 22:15:43.000000000 +0100
++++ openjdk/jdk/src/solaris/classes/sun/awt/motif/MFontConfiguration.java	2010-08-02 20:46:28.582307221 +0100
+@@ -176,6 +176,9 @@
+                 } else if ((f = new File("/etc/SuSE-release")).canRead()) {
+                     osName = "SuSE";
+                     osVersion = getVersionString(f);
++                } else if ((f = new File("/etc/gentoo-release")).canRead()) {
++                    osName = "Gentoo";
++                    osVersion = getVersionString(f);
+                 } else if ((f = new File("/etc/lsb-release")).canRead()) {
+                     /* Ubuntu and (perhaps others) use only lsb-release.
+                      * Syntax and encoding is compatible with java properties.

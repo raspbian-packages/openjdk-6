@@ -1,0 +1,40 @@
+diff -Nru openjdk.orig/jdk/src/share/native/sun/java2d/cmm/lcms/cmsxform.c openjdk/jdk/src/share/native/sun/java2d/cmm/lcms/cmsxform.c
+--- openjdk.orig/jdk/src/share/native/sun/java2d/cmm/lcms/cmsxform.c	2010-10-19 10:19:13.000000000 +0100
++++ openjdk/jdk/src/share/native/sun/java2d/cmm/lcms/cmsxform.c	2010-10-19 13:02:07.580264578 +0100
+@@ -692,6 +692,9 @@
+                 }
+                 FromLstarToXYZ(GrayTRC, Shapes1);
+ 
++                if (GrayTRC == NULL)
++                  return NULL;
++
+                 // Reversing must be done after curve translation
+ 
+                 Shapes[0] = cmsReverseGamma(Shapes1[0]->nEntries, Shapes1[0]);
+@@ -706,7 +709,7 @@
+                 // Normal case
+ 
+                 GrayTRC = cmsReadICCGammaReversed(hProfile, icSigGrayTRCTag);   // Y
+-                if (!GrayTRC) {
++                if (GrayTRC == NULL) {
+                     return NULL;
+                 }
+                 Shapes[0] = cmsDupGamma(GrayTRC);
+@@ -1348,7 +1351,7 @@
+                      p -> ToDevice = PCStoShaperMatrix;
+                      p -> OutMatShaper = cmsBuildOutputMatrixShaper(p->OutputProfile);
+ 
+-                     if (!p -> OutMatShaper) {
++                     if (!p || !p -> OutMatShaper) {
+                             cmsSignalError(LCMS_ERRC_ABORTED, "profile is unsuitable for output");
+                             return NULL;
+                             }
+@@ -1925,6 +1928,8 @@
+ 
+         ColorSpace = ColorSpaceIn;
+ 
++	Transforms[i] = NULL;
++
+ 
+         if (ColorSpace == CurrentColorSpace) {
+ 
