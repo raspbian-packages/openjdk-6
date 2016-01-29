@@ -1,0 +1,196 @@
+--- openjdk-6-6b36-1.13.8.orig/Makefile.am
++++ openjdk-6-6b36-1.13.8/Makefile.am
+@@ -11,8 +11,8 @@
+ CACAO_URL = $(CACAO_BASE_URL)/$(CACAO_VERSION).tar.gz
+ CACAO_SRC_ZIP = cacao-$(CACAO_VERSION).tar.gz
+ 
+-JAMVM_VERSION = ec18fb9e49e62dce16c5094ef1527eed619463aa
+-JAMVM_SHA256SUM = 31810266666c23822942aac62a78019c2c4589e1c5ee48329cbf42652d4437bc
++JAMVM_VERSION = 2.0.0
++JAMVM_SHA256SUM = 76428e96df0ae9dd964c7a7c74c1e9a837e2f312c39e9a357fa8178f7eff80da
+ JAMVM_BASE_URL = http://icedtea.classpath.org/download/drops/jamvm
+ JAMVM_URL = $(JAMVM_BASE_URL)/jamvm-$(JAMVM_VERSION).tar.gz
+ JAMVM_SRC_ZIP = jamvm-$(JAMVM_VERSION).tar.gz
+@@ -676,7 +676,6 @@
+ 
+ if BUILD_JAMVM
+ ICEDTEA_PATCHES += \
+-	patches/jamvm/pr2190-find_class_from_caller.patch \
+ 	patches/jamvm/noexecstack.patch
+ endif
+ 
+@@ -714,6 +713,11 @@
+ ICEDTEA_PATCHES += patches/rh1022017.patch
+ endif
+ 
++if BUILD_JAMVM
++ICEDTEA_PATCHES += \
++	patches/jamvm-2.5.3-fix.diff
++endif
++
+ ICEDTEA_PATCHES += $(DISTRIBUTION_PATCHES)
+ 
+ # Bootstrapping patches
+@@ -839,6 +843,7 @@
+ 	ALT_OUTPUTDIR="$(BUILD_OUTPUT_DIR)" \
+ 	STATIC_CXX="false" \
+ 	BUILD_GCC=gcc$(GCC_SUFFIX) \
++	BUILD_CPP=g++$(GCC_SUFFIX) \
+ 	BUILD_CXX=g++$(GCC_SUFFIX) \
+ 	COMPILER_WARNINGS_FATAL="$(WERROR_STATUS)" \
+ 	UNLIMITED_CRYPTO="true"
+@@ -2414,7 +2419,7 @@
+ stamps/jamvm.stamp: $(OPENJDK_TREE) stamps/rt.stamp
+ if BUILD_JAMVM
+ 	cd jamvm/jamvm && \
+-	./autogen.sh --with-java-runtime-library=openjdk6 \
++	./configure --with-java-runtime-library=openjdk6 \
+ 	  --prefix=$(abs_top_builddir)/jamvm/install ; \
+ 	$(MAKE) ; \
+ 	$(MAKE) install
+@@ -2555,13 +2560,15 @@
+ ADD_ZERO_CONFIGURE_ARGS += \
+ 	--enable-shark
+ endif
++_quote = '
++# 'make emacs mode happy
+ ADD_ZERO_CONFIGURE_ARGS += \
+ 	--disable-docs \
+-	$(filter-out '--with-jdk-home=% '--with-ecj=% \
+-			'--with-java=% '--with-javah=% \
+-			'--with-javac=% '--with-javac=% \
+-			'--with-rmic=% '--with-additional-vms=% \
+-			'--with-openjdk '--with-openjdk=% , \
++	$(filter-out $(_quote)--with-jdk-home=% $(_quote)--with-ecj=% \
++			$(_quote)--with-java=% $(_quote)--with-javah=% \
++			$(_quote)--with-javac=% $(_quote)--with-javac=% \
++			$(_quote)--with-rmic=% $(_quote)--with-additional-vms=% \
++			$(_quote)--with-openjdk $(_quote)--with-openjdk=% , \
+ 		$(CONFIGURE_ARGS)) \
+ 	$(if $(findstring --with-openjdk-src-zip=, $(CONFIGURE_ARGS)),, \
+ 	  --with-openjdk-src-zip=$(abs_top_builddir)/$(OPENJDK_SRC_ZIP))
+--- openjdk-6-6b36-1.13.8.orig/acinclude.m4
++++ openjdk-6-6b36-1.13.8/acinclude.m4
+@@ -22,6 +22,12 @@
+       JRE_ARCH_DIR=alpha
+       CROSS_TARGET_ARCH=alpha
+       ;;
++    arm64|aarch64)
++      BUILD_ARCH_DIR=aarch64
++      INSTALL_ARCH_DIR=aarch64
++      JRE_ARCH_DIR=aarch64
++      ARCHFLAG="-D_LITTLE_ENDIAN"
++      ;;
+     arm*)
+       BUILD_ARCH_DIR=arm
+       INSTALL_ARCH_DIR=arm
+--- openjdk-6-6b36-1.13.8.orig/autogen.sh
++++ openjdk-6-6b36-1.13.8/autogen.sh
+@@ -101,7 +101,7 @@
+ 
+ HAVE_ACLOCAL=false
+ 
+-for ACLOCAL in aclocal aclocal-1.10; do
++for ACLOCAL in aclocal-1.11 aclocal aclocal-1.10; do
+     if ${ACLOCAL} --version > /dev/null 2>&1; then
+         ACLOCAL_VERSION=`${ACLOCAL} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
+ #        echo ${ACLOCAL_VERSION}
+@@ -118,7 +118,7 @@
+ 
+ HAVE_AUTOMAKE=false
+ 
+-for AUTOMAKE in automake automake-1.10; do
++for AUTOMAKE in automake-1.11 automake automake-1.10; do
+     if ${AUTOMAKE} --version > /dev/null 2>&1; then
+         AUTOMAKE_VERSION=`${AUTOMAKE} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
+ #        echo ${AUTOMAKE_VERSION}
+--- openjdk-6-6b36-1.13.8.orig/configure.ac
++++ openjdk-6-6b36-1.13.8/configure.ac
+@@ -4,6 +4,8 @@
+ AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
+ AC_CONFIG_FILES([Makefile fsg.sh])
+ 
++AM_MAINTAINER_MODE
++
+ # Older automake doesn't generate these correctly
+ abs_top_builddir=`pwd -P`
+ AC_SUBST(abs_top_builddir)
+--- openjdk-6-6b36-1.13.8.orig/patches/jamvm-2.5.3-fix.diff
++++ openjdk-6-6b36-1.13.8/patches/jamvm-2.5.3-fix.diff
+@@ -0,0 +1,76 @@
++--- jamvm/jamvm/src/classlib/openjdk/jvm.c
+++++ jamvm/jamvm/src/classlib/openjdk/jvm.c
++@@ -517,6 +517,48 @@ jclass JVM_FindClassFromBootLoader(JNIEnv *env, const char *name) {
++ }
++ 
++ 
+++/* JVM_FindClassFromCaller
+++ * Find a class from a given class loader.  Throws ClassNotFoundException.
+++ *  name:   name of class
+++ *  init:   whether initialization is done
+++ *  loader: class loader to look up the class.
+++ *          This may not be the same as the caller's class loader.
+++ *  caller: initiating class. The initiating class may be null when a security
+++ *          manager is not installed.
+++ *
+++ * Find a class with this name in this loader,
+++ * using the caller's "protection domain".
+++ */
+++
+++jclass JVM_FindClassFromCaller(JNIEnv *env, const char *name,
+++                               jboolean init, jobject loader,
+++                               jclass caller) {
+++    Class *class;
+++
+++    TRACE("JVM_FindClassFromCaller(env=%p, name=%s, init=%d, loader=%p,"
+++          " caller=%p)", env, name, init, loader, caller);
+++
+++    /* XXX The caller's protection domain should be used during
+++       the findClassFromClassLoader but there is no specification or
+++       unit-test in OpenJDK documenting the desired effect */
+++
+++    class = findClassFromClassLoader((char *)name, loader);
+++
+++    if(class == NULL) {
+++        Object *excep = exceptionOccurred();
+++        char *dot_name = slash2DotsDup((char*)name);
+++
+++        clearException();
+++        signalChainedException(java_lang_ClassNotFoundException,
+++                               dot_name, excep);
+++        sysFree(dot_name);
+++    } else if(init)
+++        initClass(class);
+++
+++    return class;
+++}
+++
+++
++ /* JVM_FindClassFromClassLoader */
++ 
++ jclass JVM_FindClassFromClassLoader(JNIEnv *env, const char *name,
++@@ -2965,6 +3007,24 @@ void JVM_GetVersionInfo(JNIEnv *env, jvm_version_info *info, size_t info_size) {
++ }
++ 
++ 
+++/* JVM_GetTemporaryDirectory
+++ * Return the temporary directory that the VM uses for the attach
+++ * and perf data files.
+++ *
+++ * It is important that this directory is well-known and the
+++ * same for all VM instances. It cannot be affected by configuration
+++ * variables such as java.io.tmpdir.
+++ *
+++ * JamVM do not support the jvmstat framework thus this is left unimplemented.
+++ */
+++
+++jstring JVM_GetTemporaryDirectory(JNIEnv *env) {
+++    UNIMPLEMENTED("JVM_GetTemporaryDirectory");
+++
+++    return 0;
+++}
+++
+++
++ /* JVM_RegisterSignal */
++ 
++ extern void signalHandler(int sig);

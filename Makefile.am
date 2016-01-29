@@ -11,8 +11,8 @@ CACAO_BASE_URL = http://icedtea.classpath.org/download/drops/cacao
 CACAO_URL = $(CACAO_BASE_URL)/$(CACAO_VERSION).tar.gz
 CACAO_SRC_ZIP = cacao-$(CACAO_VERSION).tar.gz
 
-JAMVM_VERSION = ec18fb9e49e62dce16c5094ef1527eed619463aa
-JAMVM_SHA256SUM = 31810266666c23822942aac62a78019c2c4589e1c5ee48329cbf42652d4437bc
+JAMVM_VERSION = 2.0.0
+JAMVM_SHA256SUM = 76428e96df0ae9dd964c7a7c74c1e9a837e2f312c39e9a357fa8178f7eff80da
 JAMVM_BASE_URL = http://icedtea.classpath.org/download/drops/jamvm
 JAMVM_URL = $(JAMVM_BASE_URL)/jamvm-$(JAMVM_VERSION).tar.gz
 JAMVM_SRC_ZIP = jamvm-$(JAMVM_VERSION).tar.gz
@@ -683,7 +683,6 @@ endif
 
 if BUILD_JAMVM
 ICEDTEA_PATCHES += \
-	patches/jamvm/pr2190-find_class_from_caller.patch \
 	patches/jamvm/noexecstack.patch
 endif
 
@@ -719,6 +718,11 @@ endif
 
 if !USE_NON_NSS_CURVES
 ICEDTEA_PATCHES += patches/rh1022017.patch
+endif
+
+if BUILD_JAMVM
+ICEDTEA_PATCHES += \
+	patches/jamvm-2.5.3-fix.diff
 endif
 
 ICEDTEA_PATCHES += $(DISTRIBUTION_PATCHES)
@@ -846,6 +850,7 @@ ICEDTEA_ENV = \
 	ALT_OUTPUTDIR="$(BUILD_OUTPUT_DIR)" \
 	STATIC_CXX="false" \
 	BUILD_GCC=gcc$(GCC_SUFFIX) \
+	BUILD_CPP=g++$(GCC_SUFFIX) \
 	BUILD_CXX=g++$(GCC_SUFFIX) \
 	COMPILER_WARNINGS_FATAL="$(WERROR_STATUS)" \
 	UNLIMITED_CRYPTO="true"
@@ -2421,7 +2426,7 @@ clean-rewrite-rhino:
 stamps/jamvm.stamp: $(OPENJDK_TREE) stamps/rt.stamp
 if BUILD_JAMVM
 	cd jamvm/jamvm && \
-	./autogen.sh --with-java-runtime-library=openjdk6 \
+	./configure --with-java-runtime-library=openjdk6 \
 	  --prefix=$(abs_top_builddir)/jamvm/install ; \
 	$(MAKE) ; \
 	$(MAKE) install
@@ -2562,13 +2567,15 @@ if ADD_SHARK_BUILD
 ADD_ZERO_CONFIGURE_ARGS += \
 	--enable-shark
 endif
+_quote = '
+# 'make emacs mode happy
 ADD_ZERO_CONFIGURE_ARGS += \
 	--disable-docs \
-	$(filter-out '--with-jdk-home=% '--with-ecj=% \
-			'--with-java=% '--with-javah=% \
-			'--with-javac=% '--with-javac=% \
-			'--with-rmic=% '--with-additional-vms=% \
-			'--with-openjdk '--with-openjdk=% , \
+	$(filter-out $(_quote)--with-jdk-home=% $(_quote)--with-ecj=% \
+			$(_quote)--with-java=% $(_quote)--with-javah=% \
+			$(_quote)--with-javac=% $(_quote)--with-javac=% \
+			$(_quote)--with-rmic=% $(_quote)--with-additional-vms=% \
+			$(_quote)--with-openjdk $(_quote)--with-openjdk=% , \
 		$(CONFIGURE_ARGS)) \
 	$(if $(findstring --with-openjdk-src-zip=, $(CONFIGURE_ARGS)),, \
 	  --with-openjdk-src-zip=$(abs_top_builddir)/$(OPENJDK_SRC_ZIP))
