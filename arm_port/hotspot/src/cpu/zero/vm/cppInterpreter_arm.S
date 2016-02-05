@@ -583,13 +583,13 @@ do_\label:
 	.arch armv4
 
 #else
-	.arch armv7-a
+	.arch armv6
 #endif
 
 #ifdef HW_FP
 
 #ifdef __ARM_PCS_VFP
- 	.fpu vfpv3-d16
+ 	.fpu vfpv2
 	.eabi_attribute Tag_ABI_HardFP_use, 3
 	.eabi_attribute Tag_ABI_VFP_args, 1
 #else // __ARM_PCS_VFP
@@ -5046,7 +5046,7 @@ safe_dispatch_table:
 
 	SUB_DISPATCH_TABLES
 
-	.arch	armv7-a
+	.arch	armv6
 
 	ALIGN_CODE
 	.global	Thumb2_stubs

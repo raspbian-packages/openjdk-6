@@ -1,0 +1,11 @@
+--- openjdk/jdk/src/share/lib/security/java.security-linux
++++ openjdk/jdk/src/share/lib/security/java.security-linux
+@@ -128,6 +128,8 @@
+ # corresponding RuntimePermission ("accessClassInPackage."+package) has
+ # been granted.
+ package.access=sun.,\
++               org.GNOME.Accessibility.,\
++               org.GNOME.Bonobo.,\
+                com.sun.xml.internal.,\
+                com.sun.imageio.,\
+                com.sun.istack.internal.,\

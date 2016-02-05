@@ -4,6 +4,8 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
 AC_CONFIG_FILES([Makefile fsg.sh])
 
+AM_MAINTAINER_MODE
+
 # Older automake doesn't generate these correctly
 abs_top_builddir=`pwd -P`
 AC_SUBST(abs_top_builddir)

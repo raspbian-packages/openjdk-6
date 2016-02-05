@@ -1,0 +1,127 @@
+--- openjdk/hotspot/src/os/linux/vm/os_linux.cpp.orig	2013-12-27 21:39:31.061877774 +0100
++++ openjdk/hotspot/src/os/linux/vm/os_linux.cpp	2013-12-27 22:09:44.643208702 +0100
+@@ -4253,10 +4253,16 @@
+   // size.  Add a page for compiler2 recursion in main thread.
+   // Add in 2*BytesPerWord times page size to account for VM stack during
+   // class initialization depending on 32 or 64 bit VM.
++NOT_ZERO (
+   os::Linux::min_stack_allowed = MAX2(os::Linux::min_stack_allowed,
+             (size_t)(StackYellowPages+StackRedPages+StackShadowPages+
+                     2*BytesPerWord COMPILER2_PRESENT(+1)) * Linux::page_size());
+-
++	  )
++ZERO_ONLY (
++  os::Linux::min_stack_allowed = MAX2(os::Linux::min_stack_allowed,          
++            (size_t)(StackYellowPages+StackRedPages+StackShadowPages+
++                     2*BytesPerWord COMPILER2_PRESENT(+1)) * Linux::page_size());
++)
+   size_t threadStackSizeInBytes = ThreadStackSize * K;
+   if (threadStackSizeInBytes != 0 &&
+       threadStackSizeInBytes < os::Linux::min_stack_allowed) {
+--- openjdk/hotspot/src/os_cpu/linux_zero/vm/globals_linux_zero.hpp.orig	2013-12-27 21:39:28.693860362 +0100
++++ openjdk/hotspot/src/os_cpu/linux_zero/vm/globals_linux_zero.hpp	2013-12-27 21:55:43.465025395 +0100
+@@ -38,9 +38,13 @@
+ define_pd_global(intx,  ThreadStackSize,         1536);
+ #endif
+ #ifdef _LP64
+-define_pd_global(intx,  VMThreadStackSize,       1024);
++#if defined (_LITTLE_ENDIAN) && defined (__powerpc64__)
++define_pd_global(intx,  VMThreadStackSize,       1920);
+ #else
+-define_pd_global(intx,  VMThreadStackSize,       512);
++define_pd_global(intx,  VMThreadStackSize,       1280);
++#endif
++#else
++define_pd_global(intx,  VMThreadStackSize,       640);
+ #endif // _LP64
+ define_pd_global(intx,  CompilerThreadStackSize, 0);
+ define_pd_global(uintx, JVMInvokeMethodSlack,    8192);
+--- openjdk/corba/make/common/shared/Platform.gmk.orig	2013-12-27 21:55:43.465025395 +0100
++++ openjdk/corba/make/common/shared/Platform.gmk	2013-12-27 21:56:32.149383233 +0100
+@@ -181,7 +181,7 @@
+     # Not cross-compiling. Take architecture from running system.
+     mach := $(shell uname -m)
+     ifneq (,$(wildcard /usr/bin/dpkg-architecture))
+-      mach := $(shell (dpkg-architecture -qDEB_BUILD_ARCH_CPU 2>/dev/null || echo $(mach)) | sed 's/powerpc$$/ppc/;s/hppa/parisc/')
++      mach := $(shell (dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null || echo $(mach)) | sed 's/arm64/aarch64/;s/powerpc$$/ppc/;s/hppa/parisc/;s/ppc64el/ppc64le/')
+     endif
+   else
+     # Cross-compilation: Assume target archicture is given.
+--- openjdk/jdk/make/jdk_generic_profile.sh.orig	2013-12-27 21:39:30.029870185 +0100
++++ openjdk/jdk/make/jdk_generic_profile.sh	2013-12-27 22:04:48.649032423 +0100
+@@ -328,6 +328,7 @@
+     sparc64) ZERO_LIBARCH=sparcv9   ;;
+     arm*)    ZERO_LIBARCH=arm       ;;
+     sh*)     ZERO_LIBARCH=sh        ;;
++    ppc64le) ZERO_LIBARCH=ppc64le   ;;
+     *)       ZERO_LIBARCH="$(arch)"
+   esac
+   export ZERO_LIBARCH
+@@ -337,7 +338,7 @@
+     i386|ppc|s390|sparc|arm|sh)
+       ARCH_DATA_MODEL=32
+       ;;
+-    amd64|ppc64|s390x|sparcv9|ia64|alpha)
++    aarch64|alpha|amd64|ia64|ppc64*|s390x|sparcv9)
+       ARCH_DATA_MODEL=64
+       ;;
+     *)
+@@ -348,7 +349,7 @@
+ 
+   # ZERO_ENDIANNESS is the endianness of the processor
+   case "${ZERO_LIBARCH}" in
+-    i386|amd64|ia64)
++    arm|aarch64|amd64|i386|ia64|mips*el|ppc64le)
+       ZERO_ENDIANNESS=little
+       ;;
+     ppc*|s390*|sparc*|alpha)
+@@ -375,6 +376,9 @@
+     s390)
+       ZERO_ARCHFLAG="-m31"
+       ;;
++    arm|aarch64|ppc64le)
++      ZERO_ARCHFLAG="-D_LITTLE_ENDIAN"
++      ;;
+     *)
+       ZERO_ARCHFLAG="-m${ARCH_DATA_MODEL}"
+   esac
+--- openjdk/jdk/make/common/shared/Platform.gmk.orig	2013-12-27 21:55:43.465025395 +0100
++++ openjdk/jdk/make/common/shared/Platform.gmk	2013-12-27 22:03:36.668503607 +0100
+@@ -154,7 +154,7 @@
+   ifndef CROSS_COMPILATION
+     mach := $(shell uname -m)
+     ifneq (,$(wildcard /usr/bin/dpkg-architecture))
+-      mach := $(shell (dpkg-architecture -qDEB_BUILD_ARCH_CPU 2>/dev/null || echo $(mach)) | sed 's/powerpc$$/ppc/;s/hppa/parisc/')
++      mach := $(shell (dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null || echo $(mach)) | sed 's/arm64/aarch64/;s/powerpc$$/ppc/;s/hppa/parisc/;s/ppc64el/ppc64le/')
+     endif
+   else
+     mach := $(CROSS_TARGET_ARCH)
+@@ -203,7 +203,7 @@
+       ifeq ($(ARCH), alpha)
+         ARCH_DATA_MODEL=64
+       endif
+-      ifeq ($(ARCH), amd64)
++      ifneq (,$(findstring 64,$(ARCH)))
+         ARCH_DATA_MODEL=64
+       endif
+       ifeq ($(ARCH), arm)
+@@ -212,9 +212,6 @@
+       ifeq ($(ARCH), i586)
+         ARCH_DATA_MODEL=32
+       endif
+-      ifeq ($(ARCH), ia64)
+-        ARCH_DATA_MODEL=64
+-      endif
+       ifeq ($(ARCH), m68k)
+         ARCH_DATA_MODEL=32
+       endif
+@@ -227,9 +224,6 @@
+       ifeq ($(ARCH), ppc)
+         ARCH_DATA_MODEL=32
+       endif
+-      ifeq ($(ARCH), ppc64)
+-        ARCH_DATA_MODEL=64
+-      endif
+       ifeq ($(ARCH), s390)
+         ARCH_DATA_MODEL=32
+       endif

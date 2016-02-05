@@ -1,0 +1,28 @@
+--- openjdk/hotspot/make/linux/makefiles/vm.make~	2011-03-24 14:21:07.213057001 +0100
++++ openjdk/hotspot/make/linux/makefiles/vm.make	2011-03-24 14:32:03.443056676 +0100
+@@ -99,6 +99,11 @@
+ CPPFLAGS += -DDISTRIBUTION_ID="\"$(DISTRIBUTION_ID)\""
+ endif
+ 
++DEB_MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null || true)
++ifneq (,$(DEB_MULTIARCH))
++CXXFLAGS += -DDEB_MULTIARCH="\"$(DEB_MULTIARCH)\""
++endif
++
+ # CFLAGS_WARN holds compiler options to suppress/enable warnings.
+ CFLAGS += $(CFLAGS_WARN/BYFILE)
+ 
+--- openjdk/hotspot/src/os/linux/vm/os_linux.cpp~	2011-03-24 14:21:07.503057001 +0100
++++ openjdk/hotspot/src/os/linux/vm/os_linux.cpp	2011-03-24 14:38:06.443059044 +0100
+@@ -352,7 +352,11 @@
+  *        ...
+  *        7: The default directories, normally /lib and /usr/lib.
+  */
++#ifdef DEB_MULTIARCH
++#define DEFAULT_LIBPATH	"/usr/lib/" DEB_MULTIARCH "/jni" ":/lib/" DEB_MULTIARCH ":/usr/lib/" DEB_MULTIARCH ":/usr/lib/jni:/lib:/usr/lib"
++#else
+ #define DEFAULT_LIBPATH	"/usr/lib/jni:/lib:/usr/lib"
++#endif
+ 
+ #define EXTENSIONS_DIR  "/lib/ext"
+ #define ENDORSED_DIR    "/lib/endorsed"

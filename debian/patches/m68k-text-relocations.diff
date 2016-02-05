@@ -1,0 +1,11 @@
+--- openjdk/hotspot/make/linux/makefiles/gcc.make~	2013-12-27 21:21:19.345845283 +0100
++++ openjdk/hotspot/make/linux/makefiles/gcc.make	2013-12-27 21:37:36.805037659 +0100
+@@ -67,7 +67,7 @@
+ PICFLAG = -fPIC
+ endif
+ 
+-ifneq ($(filter alpha parisc ppc ppc64 s390 s390x sparc sparc64 sparcv9,$(ZERO_LIBARCH)),)
++ifneq ($(filter alpha m68k parisc ppc ppc64 s390 s390x sparc sparc64 sparcv9,$(ZERO_LIBARCH)),)
+ PICFLAG = -fPIC
+ else
+ PICFLAG = -fpic

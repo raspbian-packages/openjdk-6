@@ -22,6 +22,12 @@ AC_DEFUN([IT_SET_ARCH_SETTINGS],
       JRE_ARCH_DIR=alpha
       CROSS_TARGET_ARCH=alpha
       ;;
+    arm64|aarch64)
+      BUILD_ARCH_DIR=aarch64
+      INSTALL_ARCH_DIR=aarch64
+      JRE_ARCH_DIR=aarch64
+      ARCHFLAG="-D_LITTLE_ENDIAN"
+      ;;
     arm*)
       BUILD_ARCH_DIR=arm
       INSTALL_ARCH_DIR=arm

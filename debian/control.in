@@ -1,0 +1,139 @@
+Source: @basename@
+Section: java
+Priority: optional
+Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
+Uploaders: Torsten Werner <twerner@debian.org>, Matthias Klose <doko@ubuntu.com>, Damien Raude-Morvan <drazzib@debian.org>
+Build-Depends: debhelper (>= 5), binutils-dev [armel armhf], m4, lsb-release, wget, zip, unzip, sharutils, gawk, cpio, pkg-config, procps, time, @bd_fastjar@ @bd_compress@ @bd_autotools@ @bd_ant@ @bd_cacao@ @bd_gcc@ @bd_bootstrap@ @bd_openjdk@ @bd_zero@ @bd_shark@ @bd_syslibs@ @bd_pulsejava@ @bd_nss@ @bd_systemtap@ @bd_mauve@ @bd_xvfb@
+Standards-Version: 3.9.6
+Homepage: http://openjdk.java.net/
+Vcs-Bzr: http://bazaar.launchpad.net/~openjdk/openjdk/openjdk6
+Vcs-Browser: https://code.launchpad.net/~openjdk/openjdk/openjdk6
+
+Package: @basename@-jdk
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${dpkg:Depends}
+Depends: @basename@-jre (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Recommends: libxt-dev
+Suggests: @basename@-demo, @basename@-source, visualvm
+Provides: java-sdk, java2-sdk, java5-sdk, java6-sdk, java-compiler
+Conflicts: @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1)
+Description: OpenJDK Development Kit (JDK)
+ OpenJDK is a development environment for building applications,
+ applets, and components using the Java programming language.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-jre-headless
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${dpkg:Depends}, ${multiarch:Depends}
+Depends: @basename@-jre-lib (= ${source:Version}), ${jredefault:Depends}, ${cacert:Depends}, ${tzdata:Depends}, ${jcommon:Depends}, ${dlopenhl:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Recommends: ${dlopenjl:Recommends}, ${cacao:Recommends}, ${jamvm:Recommends}
+Suggests: libnss-mdns, sun-java6-fonts, @core_fonts@, @cjk_fonts@
+Provides: java-runtime-headless, java2-runtime-headless, java5-runtime-headless, java6-runtime-headless, ${defaultvm:Provides}, ${jvm:Provides}
+Replaces: @basename@-jre-lib (<< 6b23~pre10), @basename@-jre (<< 6b23~pre1), @basename@-jdk (<< 6b20-1.9.1-0ubuntu2)
+Conflicts: ${multiarch:Conflicts}, @basename@-jre-lib (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1), @basename@-jdk (<< 6b17~pre3-1), @basename@-demo (<< 6b17~pre3-1), @basename@-source (<< 6b17~pre3-1), @basename@-doc (<< 6b17~pre3-1), @basename@-dbg (<< 6b17~pre3-1), @basename@-jre-zero (<< 6b17~pre3-1)
+Description: OpenJDK Java runtime, using ${vm:Name} (headless)
+ Minimal Java runtime - needed for executing non GUI Java programs,
+ using ${vm:Name}.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-jre
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${dpkg:Depends}
+Depends: @basename@-jre-headless (= ${binary:Version}), ${xandsound:Depends}, ${shlibs:Depends}, ${dlopenjre:Depends}, ${misc:Depends}, ${dep:bridge}
+Recommends: ${dlopenjre:Recommends}, @core_fonts@, icedtea-netx
+Suggests: icedtea-plugin, ${pkg:pulseaudio}
+Conflicts: icedtea-gcjwebplugin (<< 1.0-1ubuntu4), @basename@-jre-lib (<< 6b17~pre3-1), @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jdk (<< 6b17~pre3-1), @basename@-demo (<< 6b17~pre3-1), @basename@-source (<< 6b17~pre3-1), @basename@-doc (<< 6b17~pre3-1), @basename@-dbg (<< 6b17~pre3-1), @basename@-jre-zero (<< 6b17~pre3-1)
+Replaces: openjdk-6-jre-headless (<< 6b16~pre3), openjdk-6-jdk (<< 6b20-1.10~pre2-0ubuntu1)
+Provides: java-runtime, java2-runtime, java5-runtime, java6-runtime
+Description: OpenJDK Java runtime, using ${vm:Name}
+ Full Java runtime environment - needed for executing Java GUI and Webstart
+ programs, using ${vm:Name}.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-jre-lib
+Architecture: @lib_arch@
+Multi-Arch: foreign
+Pre-Depends: ${dpkg:Depends}
+Depends: @basename@-jre-headless (>= ${base:Version}), ${misc:Depends}
+Recommends: ${dlopen:Recommends}
+Conflicts: @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1)
+Breaks: openjdk-6-jre-headless (<< 6b23~pre9-1~)
+Built-Using: ${rhino:Source}
+Description: OpenJDK Java runtime (architecture independent libraries)
+ OpenJDK Java runtime, using ${vm:Name}.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-demo
+Architecture: any
+Priority: extra
+Pre-Depends: ${dpkg:Depends}
+Depends: @basename@-jre (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1)
+Description: Java runtime based on OpenJDK (demos and examples)
+ OpenJDK Java runtime
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-source
+Architecture: all
+Priority: extra
+Pre-Depends: ${dpkg:Depends}
+Depends: @basename@-jre (>= ${source:Version}), @basename@-jdk (>= ${binary:Version}), ${misc:Depends}
+Conflicts: @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1)
+Description: OpenJDK Development Kit (JDK) source files
+ OpenJDK is a development environment for building applications,
+ applets, and components using the Java programming language.
+ .
+ This package contains the Java programming language source files
+ (src.zip) for all classes that make up the Java core API.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-doc
+Section: doc
+Pre-Depends: ${dpkg:Depends}
+Architecture: all
+Priority: extra
+Depends: ${misc:Depends}
+Suggests: @basename@-jdk
+Conflicts: @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1)
+Description: OpenJDK Development Kit (JDK) documentation
+ OpenJDK is a development environment for building applications,
+ applets, and components using the Java programming language.
+ .
+ This package contains the API documentation.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.
+
+Package: @basename@-dbg
+Architecture: any
+Multi-Arch: same
+Priority: extra
+Section: debug
+Pre-Depends: ${dpkg:Depends}
+Depends: @basename@-jre-headless (= ${binary:Version}), ${misc:Depends}
+Recommends: @basename@-jre (= ${binary:Version})
+Suggests: @basename@-jdk (= ${binary:Version})
+Conflicts: @basename@-jre-headless (<< 6b17~pre3-1), @basename@-jre (<< 6b17~pre3-1)
+Description: Java runtime based on OpenJDK (debugging symbols)
+ OpenJDK is a development environment for building applications,
+ applets, and components using the Java programming language.
+ .
+ This package contains the debugging symbols.
+ .
+ The packages are built using the IcedTea build support and patches
+ from the IcedTea project.

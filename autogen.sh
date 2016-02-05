@@ -101,7 +101,7 @@ fi
 
 HAVE_ACLOCAL=false
 
-for ACLOCAL in aclocal aclocal-1.10; do
+for ACLOCAL in aclocal-1.11 aclocal aclocal-1.10; do
     if ${ACLOCAL} --version > /dev/null 2>&1; then
         ACLOCAL_VERSION=`${ACLOCAL} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
 #        echo ${ACLOCAL_VERSION}
@@ -118,7 +118,7 @@ done
 
 HAVE_AUTOMAKE=false
 
-for AUTOMAKE in automake automake-1.10; do
+for AUTOMAKE in automake-1.11 automake automake-1.10; do
     if ${AUTOMAKE} --version > /dev/null 2>&1; then
         AUTOMAKE_VERSION=`${AUTOMAKE} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
 #        echo ${AUTOMAKE_VERSION}
